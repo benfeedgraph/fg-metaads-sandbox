@@ -175,6 +175,22 @@ async function main() {
     detail: `product_id=${irow?.product_id}`,
   });
 
+  // `date_start` / `date_stop` are envelope fields on every insights row in the real
+  // Graph API: returned whether or not `fields` lists them (and they cannot be listed
+  // alongside date_preset). Note the request above does NOT ask for them. When the
+  // sandbox omitted them, clients synthesized their own window and then silently
+  // disagreed with a real account.
+  checks.push({
+    name: "insights rows always carry date_start/date_stop (not requested in fields)",
+    pass: typeof irow?.date_start === "string" && typeof irow?.date_stop === "string",
+    detail: `date_start=${irow?.date_start} date_stop=${irow?.date_stop}`,
+  });
+  checks.push({
+    name: "time_increment=1 yields single-day rows (date_start === date_stop)",
+    pass: irow?.date_start === irow?.date_stop,
+    detail: `${irow?.date_start} .. ${irow?.date_stop}`,
+  });
+
   const campId = campRows?.[0]?.id;
   if (campId) {
     const batch = await req("GET", `/${V}/?ids=${campId}&fields=objective,smart_promotion_type`, { headers: auth });

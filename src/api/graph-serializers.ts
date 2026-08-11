@@ -296,6 +296,13 @@ export function insightToGraphRow(
   }
   if (!opts.fields) return out;
   const picked = pickFields(out, opts.fields);
+  // `date_start` / `date_stop` are envelope fields on every insights row in the real
+  // Graph API — they are returned whether or not `fields` asks for them (and Meta
+  // rejects them *inside* `fields` alongside `date_preset`, so clients cannot request
+  // them). Dropping them here let clients fabricate their own window against the
+  // sandbox and then silently disagree with a real account. Always emit them.
+  picked.date_start = out.date_start;
+  picked.date_stop = out.date_stop;
   if (opts.productBreakdown && row.productId) {
     picked.product_id = row.productId;
     if (row.productName) picked.product_name = row.productName;
