@@ -1,6 +1,7 @@
 node_modules/
 dist/
-data/
+# runtime SQLite dir only - NOT script/data/ (vendored seed fixtures)
+/data/
 *.db
 *.db-*
 .DS_Store

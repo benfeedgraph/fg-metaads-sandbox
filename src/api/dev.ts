@@ -1,7 +1,7 @@
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import express, { Router, type Request, type Response } from "express";
-import { config } from "../config.js";
+import { config, publicBaseUrl } from "../config.js";
 import { META_GRAPH_API_PATHS, META_GRAPH_DOC_LINKS } from "./graph-paths.js";
 import { uiApiRouter } from "./ui-api.js";
 import { catalogImageSvgPlaceholder } from "../lib/product-images.js";
@@ -28,7 +28,7 @@ devRouter.get("/catalog-image", (req: Request, res: Response) => {
 
 devRouter.get("/", (req, res) => {
   if (req.accepts(["html", "json"]) === "json") {
-    const base = `http://localhost:${config.port}`;
+    const base = publicBaseUrl();
     return res.json({
       name: "FeedGraph Meta Ads Sandbox Simulator",
       mode: "sandbox",
@@ -48,7 +48,7 @@ devRouter.get("/health", (_req, res) => {
 });
 
 devRouter.get("/info", (_req, res) => {
-  const base = `http://localhost:${config.port}`;
+  const base = publicBaseUrl();
   const v = config.apiVersion;
   const act = config.adAccountId;
   res.json({

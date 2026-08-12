@@ -39,6 +39,16 @@ export function resolveDbPath(): string {
   return path.isAbsolute(config.dbPath) ? config.dbPath : path.resolve(process.cwd(), config.dbPath);
 }
 
+/**
+ * Externally reachable origin for URLs we hand back to callers (paging.next, dev console links).
+ * Must NOT be localhost when deployed — FeedGraph follows `paging.next` verbatim, so a localhost
+ * value makes page 2+ resolve on the *client's* machine instead of this server.
+ * Set PUBLIC_BASE_URL explicitly; RAILWAY_PUBLIC_DOMAIN is picked up automatically on Railway.
+ */
 export function publicBaseUrl(): string {
+  const explicit = (process.env.PUBLIC_BASE_URL || "").trim();
+  if (explicit) return explicit.replace(/\/$/, "");
+  const railway = (process.env.RAILWAY_PUBLIC_DOMAIN || "").trim();
+  if (railway) return `https://${railway.replace(/^https?:\/\//, "").replace(/\/$/, "")}`;
   return `http://localhost:${config.port}`;
 }
